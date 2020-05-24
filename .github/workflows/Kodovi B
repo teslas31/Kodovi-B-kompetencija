@@ -9,7 +9,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.OleDb;
+
+-
+-
+-
+-
 B1B2:
+-
+-
+-
+-
+
+
 private void PrijavaPasa_Load(object sender, EventArgs e)
         {
             OleDbConnection con = new OleDbConnection();
