@@ -1,0 +1,3390 @@
+BIBLIOTEKE ZA SVAKI PROGRAM:
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Data.OleDb;
+B1B2:
+private void PrijavaPasa_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B1.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM PAS ORDER BY PasID");
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox1.Items.Add(reader["PasID"].ToString()+'-'+reader["Ime"].ToString());
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            //izlozba
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM Izlozba ORDER BY IzlozbaID");
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox2.Items.Add(reader["IzlozbaID"].ToString() + '-' + reader["Mesto"].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            //kategorija
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM Kategorija ORDER BY KategorijaID");
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox3.Items.Add(reader["KategorijaID"].ToString() + '-' + reader["Naziv"].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+
+private void radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            button1.Enabled = false; obrni u 2
+            button2.Enabled = true; obrni u 2
+            comboBox2.Enabled = false; obrni u 2
+            comboBox3.Enabled = false; obrni u 2
+        }
+private void upisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B1.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            string str1 = comboBox1.SelectedItem.ToString(), str2 = comboBox2.SelectedItem.ToString(), str3 = comboBox3.SelectedItem.ToString();
+
+str1 = str1.Substring(0, str1.IndexOf('-'));
+str2 = str2.Substring(0, str2.IndexOf('-'));
+str3 = str3.Substring(0, str3.IndexOf('-'));
+            cmd.CommandText = string.Format("INSERT INTO REZULTAT(IzlozbaID,KategorijaID,PasID) VALUES('{0}',{1},{2})",str2, Convert.ToInt32(str3), Convert.ToInt32(str1));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno prijavljen pas");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }        }
+private void obrisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B1.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            string str1 = comboBox1.SelectedItem.ToString();
+            str1 = str1.Substring(0, str1.IndexOf('-'));
+            cmd.CommandText = string.Format("DELETE FROM REZULTAT WHERE PasID={0}",Convert.ToInt32(str1));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno izbrisan pas");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }}
+
+private void SpisakPasa_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B1.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM Izlozba ORDER BY IzlozbaID");
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox1.Items.Add(reader["IzlozbaID"].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }        }
+private void comboBox1_SelectedIndexChanged (object sender, EventArgs e)
+        {
+            label4.Visible = true;
+            label5.Visible = true;
+            int izl =Convert.ToInt32( comboBox1.SelectedItem.ToString());
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B1.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT COUNT(PasID) as prvi FROM REZULTAT WHERE IzlozbaID={0}",izl);
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read(); label4.Text = reader["prvi"].ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT COUNT(PasID) as drugi FROM REZULTAT WHERE IzlozbaID={0} AND Rezultat IS NOT NULL", izl);
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read(); label5.Text = reader["drugi"].ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }}
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            int izl = Convert.ToInt32(comboBox1.SelectedItem.ToString());
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B1.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT KATEGORIJA.KategorijaID,
+
+KATEGORIJA.Naziv, Count(REZULTAT.PasID) AS 
+
+BrojPasa FROM KATEGORIJA INNER JOIN REZULTAT ON 
+
+KATEGORIJA.KategorijaID = REZULTAT.KategorijaID 
+
+WHERE REZULTAT.Rezultat Is Not Null AND 
+
+REZULTAT.IzlozbaID={0} GROUP BY 
+
+REZULTAT.IzlozbaID, KATEGORIJA.KategorijaID, 
+
+KATEGORIJA.Naziv", izl);
+            try
+            {
+                con.Open();
+                DataSet ds = new DataSet();
+                OleDbDataAdapter da = new OleDbDataAdapter();
+                da.SelectCommand = cmd;
+                da.Fill(ds);
+                dataGridView1.DataSource = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            } }
+private void SpisakPoRasi_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B2.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM Izlozba ORDER BY IzlozbaID");//planirano je da svi id-evi budu isti ali posto je u kreiranoj bazi bilo id-eva koji nisu oblika XXX0099 sort ne lici ni na sta :)
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox1.Items.Add(reader["IzlozbaID"].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            //rasa
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM RASA ORDER BY RasaID");
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox2.Items.Add(reader["NazivRase"].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+    }
+
+
+
+private void IzlozbaCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            label5.Visible = true;
+            string izl = comboBox1.SelectedItem.ToString();
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B2.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT COUNT(PasID) as prvi FROM REZULTAT WHERE IzlozbaID='{0}' AND Rezultat IS NOT NULL", izl);
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read(); label5.Text = reader["prvi"].ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }  }
+private void RasaCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            label6.Visible = true;
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B2.accdb";
+OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT Count(REZULTAT.PasID) AS 
+
+drugi FROM RASA INNER JOIN (PAS INNER JOIN 
+
+REZULTAT ON PAS.PasID = REZULTAT.PasID) ON 
+
+RASA.RasaID = PAS.RasaID WHERE 
+
+REZULTAT.IzlozbaID='{0}' AND 
+RASA.NazivRase='{1}' AND REZULTAT.Rezultat Is Not Null", comboBox1.SelectedItem,comboBox2.SelectedItem);
+
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read(); label6.Text = reader["drugi"].ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }        }
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B2.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT PAS.Ime as ImePsa FROM 
+
+(RASA INNER JOIN PAS ON RASA.RasaID = 
+
+PAS.RasaID) INNER JOIN (IZLOZBA INNER JOIN 
+
+REZULTAT ON IZLOZBA.IzlozbaID = 
+
+REZULTAT.IzlozbaID) ON PAS.PasID = 
+
+REZULTAT.PasID WHERE REZULTAT.Rezultat Is Not 
+
+Null AND REZULTAT.IzlozbaID='{0}' AND 
+
+RASA.NazivRase='{1}' GROUP BY 
+
+REZULTAT.IzlozbaID, REZULTAT.PasID, 
+
+RASA.NazivRase, PAS.Ime", comboBox1.SelectedItem, comboBox2.SelectedItem);
+            try
+            {
+                con.Open();
+                DataSet ds = new DataSet();
+                OleDbDataAdapter da = new OleDbDataAdapter();
+                da.SelectCommand = cmd;
+                da.Fill(ds);
+                dataGridView1.DataSource = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }     }
+
+UNOS PASA PROZOR:
+private void UpisRadioBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            button1.Enabled = true; obrni u 2
+            button2.Enabled = false; obrni u 2
+            dateTimePicker1.Enabled = true; obrni u 2
+            textBox2.Enabled = true; obrni u 2
+            //textBox1.Enabled = true; dodas za radio btn obrisi
+        }
+private void Unesi_Click(object sender, EventArgs e)
+        {
+            DateTime d = dateTimePicker1.Value;
+            string mesecm;
+            int mesec = d.Month;
+            int godina = d.Year;
+            int dan = d.Day;
+            if (mesec < 10) mesecm = '0' + mesec.ToString();
+            else mesecm = mesec.ToString();
+            string grad = textBox2.Text; grad = grad.Substring(0, 3); grad = grad.ToUpper();
+            string sifra = grad + mesecm + godina.ToString();
+            textBox1.Text = sifra;
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B2.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("INSERT INTO IZLOZBA VALUES('{0}','{1}',#{2}#)", textBox1.Text, textBox2.Text, dateTimePicker1.Value.ToShortDateString());
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno ste dodali izlozbu");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }            
+        }
+private void Obrisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B2.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("DELETE FROM IZLOZBA WHERE IzlozbaID='{0}'", textBox1.Text);
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno ste izbrisali izlozbu");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }        }
+B3B4:
+private void FormaGlumci_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com = new OleDbCommand();
+            com.Connection = con;
+            com.CommandText = "Select * From Glumac";
+            DataSet ds = new DataSet();
+            OleDbDataAdapter da = new OleDbDataAdapter();
+            da.SelectCommand = com;
+            da.Fill(ds);
+            foreach (DataRow dr in ds.Tables[0].Rows)
+                listBox1.Items.Add(dr[0].ToString() + " " + dr[1].ToString() + " " + dr[2].ToString() + " " + dr[3].ToString() + " " + dr[4].ToString());
+        }
+
+private void upisi_Click(object sender, EventArgs e)
+        {
+            DateTime dt = Convert.ToDateTime(dateTimePicker1.Value);
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com = new OleDbCommand();
+            com.Connection = con;
+            com.CommandText = "Insert Into Glumac Values (" + Convert.ToInt32(textBox1.Text) + " ,'" + textBox2.Text + "','" + textBox3.Text + "',@value ,'" + textBox5.Text + "');";
+            com.Parameters.AddWithValue("@value", dt);
+            try
+            {
+                con.Open();
+                com.ExecuteNonQuery();
+                con.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+private void obrisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com = new OleDbCommand();
+            com.Connection = con;
+            if (textBox2.Text != "" && textBox3.Text != "" && dateTimePicker1.Value.ToString() == "" && textBox5.Text == "" && textBox1.Text == "")
+            {
+                com.CommandText = string.Format("Delete From Glumac Where Ime='{0}' And Prezime='{1}'", textBox2.Text, textBox3.Text);
+                try
+                {
+                    con.Open();
+                    com.ExecuteNonQuery();
+                    con.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+        }
+
+private void izmeni_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com = new OleDbCommand();
+            com.Connection = con;
+            if (textBox2.Text != "" && textBox3.Text != "" && textBox5.Text == "" && textBox1.Text != "")
+            {
+                com.CommandText = string.Format("Update Glumac Set Ime='{0}', Prezime='{1}' Where GlumacID={2}", textBox2.Text, textBox3.Text, Convert.ToInt32(textBox1.Text));
+                try
+                {
+                    con.Open();
+                    com.ExecuteNonQuery();
+                    con.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                } } }
+
+private void osvezi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection Konekcija = new OleDbConnection();
+            Konekcija.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B3.accdb";
+            OleDbCommand Komanda = new OleDbCommand();
+            Komanda.Connection = Konekcija;
+            Komanda.CommandText = "Select * From Glumac";
+            DataSet Ds = new DataSet();
+            OleDbDataAdapter Da = new OleDbDataAdapter();
+            Da.SelectCommand = Komanda;
+            Da.Fill(Ds);
+dataGridView1.DataSource = Ds.Tables[0];
+            }
+private void zanroviIglumci_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com = new OleDbCommand();
+            com.Connection = con;
+            com.CommandText = "Select NazivZanra From Zanr ORDER BY NazivZanra asc";
+            DataSet Ds = new DataSet();
+            OleDbDataAdapter Da = new OleDbDataAdapter();
+            Da.SelectCommand = com;
+            Da.Fill(Ds);
+            foreach (DataRow dr in Ds.Tables[0].Rows)
+                comboBox1.Items.Add(dr["NazivZanra"].ToString());
+        }
+
+private void prikazi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com = new OleDbCommand();
+            com.Connection = con;
+            com.CommandText = string.Format("Select Naziv,ImeLika,Tip,Trajanje,Ime,Prezime,NazivZanr
+
+a From Film,Uloga,Tip_Uloge,Glumac,Zanr where 
+
+Film.FilmID=Uloga.FilmID and 
+
+Uloga.TipUlogeID=Tip_Uloge.TipUlogeID and 
+
+Uloga.GlumacID=Glumac.GlumacID and 
+
+Film.ZanrID=Zanr.ZanrID and Glumac.Ime='{0}' and 
+
+Glumac.Prezime='{1}' and Zanr.NazivZanra='{2}' 
+
+Order By Film.Trajanje Desc", textBox1.Text, textBox2.Text, comboBox1.SelectedItem);
+            DataSet ds = new DataSet();
+            OleDbDataAdapter da = new OleDbDataAdapter();
+            da.SelectCommand = com;
+            da.Fill(ds);
+            listBox1.DataSource = ds.Tables[0];
+        }
+private void FormaProducenti_Load(object sender, EventArgs e)
+        {
+            listBox1.Items.Clear();
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com = new OleDbCommand();
+            com.Connection = con;
+            com.CommandText = "Select * From Producent";
+            DataSet ds = new DataSet();
+            OleDbDataAdapter da = new OleDbDataAdapter();
+            da.SelectCommand = com;
+            da.Fill(ds);
+            foreach (DataRow dr in ds.Tables[0].Rows)
+                listBox1.Items.Add(dr[0].ToString() + " " + dr[1].ToString() + " " + dr[2].ToString() + " " + dr[3].ToString() + " ");
+        }
+
+private void sifratbx_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox2.Text == "" && textBox3.Text == "" && textBox1.Text != "")
+            {
+                try
+                {
+                    listBox1.Items.Clear();
+                    OleDbConnection con = new OleDbConnection();
+                    con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+                    OleDbCommand com = new OleDbCommand();
+                    com.Connection = con;
+                    com.CommandText = "Select * From Producent Where ProducentID = " + textBox1.Text;
+                    DataSet ds = new DataSet();
+                    OleDbDataAdapter da = new OleDbDataAdapter();
+                    da.SelectCommand = com;
+                    da.Fill(ds);
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                        listBox1.Items.Add(dr[0].ToString() + " " + dr[1].ToString() + " " + dr[2].ToString() + " " + dr[3].ToString() + " ");
+                }
+                catch
+                {
+                    listBox1.Items.Clear();
+                    OleDbConnection con = new OleDbConnection();
+                    con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+                    OleDbCommand com = new OleDbCommand();
+                    com.Connection = con;
+                    com.CommandText = "Select * From Producent";
+                    DataSet ds = new DataSet();
+                    OleDbDataAdapter da = new OleDbDataAdapter();
+                    da.SelectCommand = com;
+                    da.Fill(ds);
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                        listBox1.Items.Add(dr[0].ToString() + " " + dr[1].ToString() + " " + dr[2].ToString() + " " + dr[3].ToString() + " ");
+                }
+            }                   }
+private void Upisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com = new OleDbCommand();
+            com.Connection = con;
+            com.CommandText = string.Format("Insert Into Producent(ProducentID,Ime,Email) Values({0},'{1}','{2}')", Convert.ToInt32(textBox1.Text), textBox2.Text, textBox3.Text);
+            try
+            {
+                con.Open();
+                com.ExecuteNonQuery();
+                con.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+private void obrisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com = new OleDbCommand();
+            com.Connection = con;
+            if (textBox2.Text != "" && textBox3.Text != "" && textBox1.Text == "")
+            {
+                com.CommandText = string.Format("Delete From Producent Where Ime='{0}' AND Email='{1}' ", textBox2.Text, textBox3.Text);
+                try
+                {
+                    con.Open();
+                    com.ExecuteNonQuery();
+                    con.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+        }
+
+private void izmeni_Click(object sender, EventArgs e)
+        {
+            listBox1.Items.Clear();
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com = new OleDbCommand();
+            com.Connection = con;
+            if (textBox2.Text != "" && textBox3.Text != "" && textBox1.Text != "")
+            {
+                com.CommandText = string.Format("Update Producent Set Ime='{0}', Email='{1}' Where ProducentID={2}", textBox2.Text, textBox3.Text, Convert.ToInt32(textBox1.Text));
+                try
+                {
+                    con.Open();
+                    com.ExecuteNonQuery();
+                    con.Close();
+                    com.Connection = con;
+                    com.CommandText = "Select * From Producent";
+                    DataSet ds = new DataSet();
+                    OleDbDataAdapter da = new OleDbDataAdapter();
+                    da.SelectCommand = com;
+                    da.Fill(ds);
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                        listBox1.Items.Add(dr[0].ToString() + " " + dr[1].ToString() + " " + dr[2].ToString() + " " + dr[3].ToString() + " ");
+                    textBox1.Text = textBox2.Text = textBox3.Text = "";
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+        }
+
+private void tipUlogeIproducent_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com1 = new OleDbCommand();
+            OleDbCommand com2 = new OleDbCommand();
+            com1.Connection = con;
+            com1.CommandText = "Select Tip From Tip_Uloge Order By Tip asc";
+            com2.Connection = con;
+            com2.CommandText = "Select Ime from Producent Order By Ime asc";
+            DataSet ds1 = new DataSet();
+            DataSet ds2 = new DataSet();
+            OleDbDataAdapter Da = new OleDbDataAdapter();
+            Da.SelectCommand = com1;
+            Da.Fill(ds1);
+            foreach (DataRow dr in ds1.Tables[0].Rows)
+                comboBox1.Items.Add(dr["Tip"].ToString());
+            Da.SelectCommand = com2;
+            Da.Fill(ds2);
+            foreach (DataRow dr in ds2.Tables[0].Rows)
+                comboBox2.Items.Add(dr["Ime"].ToString());
+        }
+
+private void Prkazi_Click(object sender, EventArgs e)
+        {
+            listBox1.Items.Clear();
+            string t = "Select Film.Naziv, 
+
+Uloga.ImeLika, Glumac.Ime, Glumac.Prezime From 
+
+(((((Producent Inner Join Producirao On 
+
+Producent.ProducentID = Producirao.ProducentID) 
+
+Inner Join Film On Producirao.FilmID = 
+
+Film.FilmID) Inner Join Uloga On Film.FilmID = 
+
+Uloga.FilmID) Inner Join Tip_Uloge On 
+
+Uloga.TipUlogeID = Tip_Uloge.TipUlogeID) Inner 
+
+Join Glumac On Glumac.GlumacID = Uloga.GlumacID) 
+
+Where Producent.Ime = '" + comboBox2.SelectedItem + "' And Tip_Uloge.Tip = '" + comboBox1.SelectedItem + "';";
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=Vukovic Janko 408 - B3.accdb";
+            OleDbCommand com = new OleDbCommand();
+            com.Connection = con;
+            com.CommandText = t;
+            DataSet Ds = new DataSet();
+            OleDbDataAdapter Da = new OleDbDataAdapter();
+            Da.SelectCommand = com;
+            Da.Fill(Ds);
+            foreach (DataRow dr in Ds.Tables[0].Rows)
+                listBox1.Items.Add(dr["Naziv"].ToString() + '	' + dr["ImeLika"].ToString() + '	' + dr["Ime"].ToString() + '	' + dr["Prezime"].ToString());
+        }
+B5B6:
+private void UnosGradova_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Grad ORDER BY GradID asc";
+            try
+            {
+                con.Open();
+                using (OleDbDataReader reader = cmd.ExecuteReader())
+                {
+                    reader.Read();
+                    textBox1.Text = reader["GradID"].ToString();
+                    textBox2.Text = reader["Grad"].ToString();
+                    textBox3.Text = reader["PozivniBroj"].ToString();
+                    textBox4.Text = reader["PostanskiBroj"].ToString();
+                    textBox5.Text = reader["BrojStanovnika"].ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+private void Prethodni_Click(object sender, EventArgs e)
+        {
+            int sifra;
+            if (String.Compare(textBox1.Text, "") == 0) sifra = 0;
+            else sifra = Convert.ToInt32(textBox1.Text);
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Grad ORDER BY GradID asc";
+            try
+            {
+                con.Open();
+                using(OleDbDataReader reader = cmd.ExecuteReader())
+                {
+                    if (sifra != 0)
+                    {
+                        reader.Read();
+                        while (Convert.ToInt32(reader["GradID"]) < sifra-1) reader.Read();
+                        textBox1.Text = reader["GradID"].ToString();
+                        textBox2.Text = reader["Grad"].ToString();
+                        textBox3.Text = reader["PozivniBroj"].ToString();
+                        textBox4.Text = reader["PostanskiBroj"].ToString();
+                        textBox5.Text = reader["BrojStanovnika"].ToString();
+                    }
+                    if (sifra == 0)//prvi slog
+                    {
+                        reader.Read();
+                        textBox1.Text = reader["GradID"].ToString();
+                        textBox2.Text = reader["Grad"].ToString();
+                        textBox3.Text = reader["PozivniBroj"].ToString();
+                        textBox4.Text = reader["PostanskiBroj"].ToString();
+                        textBox5.Text = reader["BrojStanovnika"].ToString();
+                    }
+
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+private void Sledeci_Click(object sender, EventArgs e)
+        {
+            int sifra;
+            if (String.Compare(textBox1.Text, "") == 0) sifra = 0;
+            else sifra = Convert.ToInt32(textBox1.Text);
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Grad ORDER BY GradID asc";
+            try
+            {
+                con.Open();
+                using (OleDbDataReader reader = cmd.ExecuteReader())
+                { 
+                    if (sifra == 0)
+                    {
+                        while (reader.Read()) ;
+                        textBox1.Text = reader["GradID"].ToString();
+                        textBox2.Text = reader["Grad"].ToString();
+                        textBox3.Text = reader["PozivniBroj"].ToString();
+                        textBox4.Text = reader["PostanskiBroj"].ToString();
+                        textBox5.Text = reader["BrojStanovnika"].ToString();
+                    }
+                    else
+                    {
+                        reader.Read();
+                        while (Convert.ToInt32(reader["GradID"]) < sifra + 1) reader.Read();
+                        textBox1.Text = reader["GradID"].ToString();
+                        textBox2.Text = reader["Grad"].ToString();
+                        textBox3.Text = reader["PozivniBroj"].ToString();
+                        textBox4.Text = reader["PostanskiBroj"].ToString();
+                        textBox5.Text = reader["BrojStanovnika"].ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+private void Novi_Click(object sender, EventArgs e)
+        {
+            textBox1.Clear();
+            textBox2.Clear();
+            textBox3.Clear();
+            textBox4.Clear();
+            textBox5.Clear();
+            textBox1.Focus();
+        }
+
+        private void Upisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("INSERT INTO Grad VALUES({0},'{1}',{2},{3},{4})", Convert.ToInt32(textBox1.Text), textBox2.Text, Convert.ToInt32(textBox3.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno ste dodali grad");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+                UnosGradova f = new UnosGradova();
+                f.Show();
+                this.Close();
+            }
+        }
+private void Spisak_Igraca_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Grad ORDER BY Grad asc";
+            try
+            {
+                con.Open();
+                using(OleDbDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        comboBox1.Items.Add(reader["Grad"].ToString());
+                    }
+                }
+                comboBox1.SelectedItem = comboBox1.Items[0];//inicijalni clan
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT Igrac.Ime, Igrac.Prezime, Klub.NazivKluba FROM Pozicija_Igraca INNER JOIN ((Grad INNER JOIN Klub ON Grad.GradID = Klub.GradID) INNER JOIN Igrac ON Klub.KlubID = Igrac.KlubID) ON Pozicija_Igraca.PozicijaID = Igrac.PozicijaID  WHERE  Grad.Grad='{0}' AND Pozicija_Igraca.Naziv='{1}' ORDER BY Igrac.Ime ASC,Igrac.Prezime ASC, Klub.NazivKluba DESC", comboBox1.SelectedItem, textBox1.Text);
+            try
+            {
+                con.Open();
+                DataSet Ds = new DataSet();
+                OleDbDataAdapter Da = new OleDbDataAdapter();
+                Da.SelectCommand = cmd;
+                Da.Fill(Ds);
+                dataGridView1.DataSource = Ds.Tables[0];
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+           
+        }
+private void UnosStadiona_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Stadion";
+           
+            OleDbCommand cmd2 = new OleDbCommand();
+            cmd2.Connection = con;
+            cmd2.CommandText = "SELECT * FROM Grad ORDER BY GradID asc";
+
+            try
+            {
+                con.Open();
+                using (OleDbDataReader reader = cmd2.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        comboBox1.Items.Add(reader["Grad"].ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+            //ispis prvog sloga
+            try
+            {
+                con.Open();
+                using (OleDbDataReader reader = cmd.ExecuteReader())
+                {
+                    reader.Read();
+                    textBox1.Text = reader["StadionID"].ToString();
+                    textBox2.Text = reader["Naziv"].ToString();
+                    textBox3.Text = reader["Adresa"].ToString();
+                    textBox4.Text = reader["Kapacitet"].ToString();
+                    textBox5.Text = reader["BrojUlaza"].ToString();
+                    comboBox1.SelectedItem =comboBox1.Items[Convert.ToInt32(reader["GradID"])-1];
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+private void Prethodni_Click(object sender, EventArgs e)
+        {
+            int sifra;
+            if (String.Compare(textBox1.Text, "") == 0) sifra = 0;
+            else sifra = Convert.ToInt32(textBox1.Text);
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Stadion ORDER BY StadionID asc";
+            try
+            {
+                con.Open();
+                using (OleDbDataReader reader = cmd.ExecuteReader())
+                {
+                    if (sifra != 0)
+                    {
+                        reader.Read();
+                        while (Convert.ToInt32(reader["StadionID"]) < sifra - 1) reader.Read();
+                        textBox1.Text = reader["StadionID"].ToString();
+                        textBox2.Text = reader["Naziv"].ToString();
+                        textBox3.Text = reader["Adresa"].ToString();
+                        textBox4.Text = reader["Kapacitet"].ToString();
+                        textBox5.Text = reader["BrojUlaza"].ToString();
+                        comboBox1.SelectedItem = comboBox1.Items[Convert.ToInt32(reader["GradID"]) - 1];
+                    }
+                    if (sifra == 0)//prvi slog
+                    {
+                        reader.Read();
+                        textBox1.Text = reader["StadionID"].ToString();
+                        textBox2.Text = reader["Naziv"].ToString();
+                        textBox3.Text = reader["Adresa"].ToString();
+                        textBox4.Text = reader["Kapacitet"].ToString();
+                        textBox5.Text = reader["BrojUlaza"].ToString();
+                        comboBox1.SelectedItem = comboBox1.Items[Convert.ToInt32(reader["GradID"]) - 1];
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+private void Sledeci_Click(object sender, EventArgs e)
+        {
+            int sifra;
+            if (String.Compare(textBox1.Text, "") == 0) sifra = 0;
+            else sifra = Convert.ToInt32(textBox1.Text);
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Stadion ORDER BY StadionID asc";
+            try
+            {
+                con.Open();
+                using (OleDbDataReader reader = cmd.ExecuteReader())
+                {
+                    if (sifra == 0)
+                    {
+                        while (reader.Read()) ;
+                        textBox1.Text = reader["StadionID"].ToString();
+                        textBox2.Text = reader["Naziv"].ToString();
+                        textBox3.Text = reader["Adresa"].ToString();
+                        textBox4.Text = reader["Kapacitet"].ToString();
+                        textBox5.Text = reader["BrojUlaza"].ToString();
+                        comboBox1.SelectedItem = comboBox1.Items[Convert.ToInt32(reader["GradID"]) - 1];
+                    }
+                    else
+                    {
+                        reader.Read();
+                        while (Convert.ToInt32(reader["GradID"]) < sifra + 1) reader.Read();
+                        textBox1.Text = reader["StadionID"].ToString();
+                        textBox2.Text = reader["Naziv"].ToString();
+                        textBox3.Text = reader["Adresa"].ToString();
+                        textBox4.Text = reader["Kapacitet"].ToString();
+                        textBox5.Text = reader["BrojUlaza"].ToString();
+                        comboBox1.SelectedItem = comboBox1.Items[Convert.ToInt32(reader["GradID"]) - 1];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+“Novi” imas gore – ne prepisuj
+
+private void Upisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("INSERT INTO Stadion VALUES({0},'{1}','{2}',{3},{4},{5})", Convert.ToInt32(textBox1.Text), textBox2.Text, textBox3.Text, Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text),Convert.ToInt32(comboBox1.SelectedIndex+1));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno ste dodali stadion");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+                UnosStadiona f = new UnosStadiona();
+                f.Show();
+                this.Close();
+            }
+        }
+Kapacitet stadiona
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT Stadion.Naziv, Klub.NazivKluba, Klub.Sajt, Stadion.Kapacitet, Stadion.BrojUlaza FROM Stadion LEFT JOIN Klub ON Stadion.StadionID = Klub.StadionID WHERE (((Stadion.Kapacitet)>{0})) ORDER BY Stadion.Kapacitet, Stadion.BrojUlaza DESC",Convert.ToInt32(textBox1.Text));
+            try
+            {
+                con.Open();
+                DataSet Ds = new DataSet();
+                OleDbDataAdapter Da = new OleDbDataAdapter();
+                Da.SelectCommand = cmd;
+                Da.Fill(Ds);
+                dataGridView1.DataSource = Ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+B25B26:
+private void Profesori_Load(object sender, EventArgs e)
+        {
+            //id novog
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT COUNT(ProfesorID) AS Izbroj FROM Profesor";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                int broj = Convert.ToInt32(reader["Izbroj"]) + 1;
+                textBox1.Text = broj.ToString();
+                textBox1.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            //listbox
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Profesor";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    listBox1.Items.Add(reader["ProfesorID"].ToString() + " - " + reader["Ime"].ToString() + " " + reader["Prezime"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void listBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            string a = listBox1.SelectedItem.ToString();
+            a = a.Substring(0, a.IndexOf(' '));
+            cmd.CommandText = string.Format("SELECT * FROM Profesor WHERE ProfesorID={0}", Convert.ToInt32(a));
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                textBox1.Text = reader["ProfesorID"].ToString();
+                textBox2.Text = reader["Ime"].ToString();
+                textBox3.Text = reader["Prezime"].ToString();
+                textBox4.Text = reader["DatumRodjenja"].ToString();
+                textBox5.Text = reader["Telefon"].ToString();
+                textBox6.Text = reader["Email"].ToString();
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+
+        }
+private void Novi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT COUNT(ProfesorID) AS Izbroj FROM Profesor";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                int broj = Convert.ToInt32(reader["Izbroj"]) + 1;
+                textBox1.Text = broj.ToString();
+                textBox1.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            textBox2.Clear();
+            textBox3.Clear();
+            textBox4.Clear();
+            textBox5.Clear();
+            textBox6.Clear();
+        }
+private void Unesi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("INSERT INTO Profesor VALUES({0},'{1}','{2}',#{3}#,'{4}','{5}')", Convert.ToInt32(textBox1.Text), textBox2.Text, textBox3.Text, textBox4.Text, textBox5.Text, textBox6.Text);
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno ste dodali profesora u bazu");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+            Profesori f = new Profesori();
+            f.Show();
+            this.Close();
+
+        }
+private void Azuriraj_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            if (textBox2.Text != "" && textBox3.Text != "" && textBox4.Text != "" && textBox1.Text != "")
+            {
+                cmd.CommandText = "Update Profesor Set Ime=@Ime, Prezime=@Prezime, DatumRodjenja=@DatumRodjenja, Telefon=@Telefon, Email=@Email Where ProfesorID=@ProfesorID";
+                cmd.Parameters.AddWithValue("Ime", textBox2.Text);
+                cmd.Parameters.AddWithValue("Prezime", textBox3.Text);
+                DateTime datum = Convert.ToDateTime(textBox4.Text);
+                cmd.Parameters.AddWithValue("DatumRodjenja", datum.ToShortDateString());
+                cmd.Parameters.AddWithValue("Telefon", textBox5.Text);
+                cmd.Parameters.AddWithValue("Email", textBox6.Text);
+                cmd.Parameters.AddWithValue("ProfesorID", Convert.ToInt32(textBox1.Text));
+                try
+                {
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Uspesno ste azurirali profesora");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
+                
+                Profesori f = new Profesori();
+                f.Show();
+                this.Close();
+            }
+        }
+private void Studenti_Load(object sender, EventArgs e)
+        {
+            //id novog
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT COUNT(StudentID) AS Izbroj FROM Student";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                int broj = Convert.ToInt32(reader["Izbroj"]) + 1;
+                textBox1.Text = broj.ToString();
+                textBox1.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            //listbox
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Student";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    listBox1.Items.Add(reader["StudentID"].ToString() + " - " + reader["Ime"].ToString() + " " + reader["Prezime"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void listBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            string a = listBox1.SelectedItem.ToString();
+            a = a.Substring(0, a.IndexOf(' '));
+            cmd.CommandText = string.Format("SELECT * FROM Student WHERE StudentID={0}", Convert.ToInt32(a));
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                textBox1.Text = reader["StudentID"].ToString();
+                textBox2.Text = reader["Ime"].ToString();
+                textBox3.Text = reader["Prezime"].ToString();
+                textBox4.Text = reader["BrojIndeksa"].ToString();
+                textBox5.Text = reader["DatumRodjenja"].ToString();
+                textBox6.Text = reader["Adresa"].ToString();
+                textBox7.Text = reader["Email"].ToString();
+                textBox8.Text = reader["Telefon"].ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+private void Novi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT COUNT(StudentID) AS Izbroj FROM Student";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                int broj = Convert.ToInt32(reader["Izbroj"]) + 1;
+                textBox1.Text = broj.ToString();
+                textBox1.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            textBox2.Clear();
+            textBox3.Clear();
+            textBox4.Clear();
+            textBox5.Clear();
+            textBox6.Clear();
+            textBox7.Clear();
+            textBox8.Clear();
+        }
+private void Unesi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("INSERT INTO Student VALUES({0},'{1}','{2}','{3}',#{4}#,'{5}','{6}','{7}')", Convert.ToInt32(textBox1.Text), textBox2.Text, textBox3.Text, textBox4.Text, textBox5.Text, textBox6.Text,textBox7.Text,textBox8.Text);
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno ste dodali studenta u bazu");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+           Studenti f = new Studenti();
+            f.Show();
+            this.Close();
+
+        }
+private void Azuriraj_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            if (textBox5.Text == "")
+            {
+            cmd.CommandText = string.Format("UPDATE Student SET Ime='{0}',Prezime='{1}',BrojIndeksa='{2}',Adresa='{3}',Email='{4}',Telefon='{5}' WHERE StudentID={6}", textBox2.Text, textBox3.Text, textBox4.Text,textBox6.Text, textBox7.Text, textBox8.Text, Convert.ToInt32(textBox1.Text));
+            }
+            else
+            cmd.CommandText=string.Format("UPDATE Student SET Ime='{0}',Prezime='{1}',BrojIndeksa='{2}',DatumRodjenja=#{3}#,Adresa='{4}',Email='{5}',Telefon='{6}' WHERE StudentID={7}",textBox2.Text,textBox3.Text,textBox4.Text,Convert.ToDateTime(textBox5.Text).ToShortDateString(),textBox6.Text,textBox7.Text,textBox8.Text,Convert.ToInt32(textBox1.Text));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno ste izmenili studenta u bazi");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+            Studenti f = new Studenti();
+            f.Show();
+            this.Close();
+        }
+Prof. koji imaju mejl
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;string stringic = "";
+            cmd.CommandText = "Select Profesor.Ime, Profesor.Prezime, Count(Kontakt_Informacije.ProfesorID) AS[Broj kontakata] From Profesor, Kontakt_Informacije Where Kontakt_Informacije.ProfesorID = Profesor.ProfesorID And DatumKontakta LIKE '" + numericUpDown1.Value.ToString() + "%" + numericUpDown2.Value.ToString() + "' And Profesor.Email<>'"+stringic+"' Group By Profesor.Ime, Profesor.Prezime";
+            OleDbDataAdapter da = new OleDbDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            dataGridView1.DataSource = ds.Tables[0];
+        }
+private void Nacrtaj_Click(object sender, EventArgs e)
+        {
+            chart1.Visible = true;
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con; string stringic = "";
+            cmd.CommandText = "Select Profesor.Ime, Profesor.Prezime, Count(Kontakt_Informacije.ProfesorID) AS[Broj kontakata] From Profesor, Kontakt_Informacije Where Kontakt_Informacije.ProfesorID = Profesor.ProfesorID And DatumKontakta LIKE '" + numericUpDown1.Value.ToString() + "%" + numericUpDown2.Value.ToString() + "' And Profesor.Email<>'" + stringic + "' Group By Profesor.Ime, Profesor.Prezime";
+            OleDbDataAdapter da = new OleDbDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            dataGridView1.DataSource = ds.Tables[0];
+            chart1.DataSource = ds.Tables[0];
+            chart1.Series["Series1"].XValueMember = "Prezime";
+            chart1.Series["Series1"].YValueMembers = "Broj kontakata";
+            chart1.Series["Series1"].ChartType = SeriesChartType.Pie;
+            chart1.Series["Series1"].IsValueShownAsLabel = true;
+            chart1.DataBind();
+        }
+Prof. koji nemaju mejl
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con; string stringic = "";
+            cmd.CommandText = "Select Profesor.Ime, Profesor.Prezime, Count(Kontakt_Informacije.ProfesorID) AS[Broj kontakata] From Profesor, Kontakt_Informacije Where Kontakt_Informacije.ProfesorID = Profesor.ProfesorID And DatumKontakta LIKE '" + numericUpDown1.Value.ToString() + "%" + numericUpDown2.Value.ToString() + "' And Profesor.Email='" + stringic + "' Group By Profesor.Ime, Profesor.Prezime";
+            OleDbDataAdapter da = new OleDbDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            dataGridView1.DataSource = ds.Tables[0];
+        }
+
+        private void Nacrtaj_Click(object sender, EventArgs e)
+        {
+            chart1.Visible = true;
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B25B26.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con; string stringic = "";
+            cmd.CommandText = "Select Profesor.Ime, Profesor.Prezime, Count(Kontakt_Informacije.ProfesorID) AS[Broj kontakata] From Profesor, Kontakt_Informacije Where Kontakt_Informacije.ProfesorID = Profesor.ProfesorID And DatumKontakta LIKE '" + numericUpDown1.Value.ToString() + "%" + numericUpDown2.Value.ToString() + "' And Profesor.Email='" + stringic + "' Group By Profesor.Ime, Profesor.Prezime";
+            OleDbDataAdapter da = new OleDbDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            dataGridView1.DataSource = ds.Tables[0];
+            chart1.DataSource = ds.Tables[0];
+            chart1.Series["Series1"].XValueMember = "Prezime";
+            chart1.Series["Series1"].YValueMembers = "Broj kontakata";
+            chart1.Series["Series1"].ChartType = SeriesChartType.Pie;
+            chart1.Series["Series1"].IsValueShownAsLabel = true;
+            chart1.DataBind();
+        }
+
+B9B10:
+Tip antikviteta
+private void Unesi_Click(object sender, EventArgs e)
+        {
+            int ind = 0;
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B9B10.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("INSERT INTO Tip_Antikviteta VALUES({0},'{1}')", Convert.ToInt32(TipAntikvitetaID.Text) , Tip.Text);
+            OleDbCommand cmd2 = new OleDbCommand();
+            cmd2.Connection = con;
+            cmd2.CommandText = string.Format("SELECT * FROM Tip_Antikviteta WHERE TipAntikvitetaID={0}", Convert.ToInt32(TipAntikvitetaID.Text));
+            try
+            {
+                con.Open();
+                using (OleDbDataReader reader = cmd2.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if(Convert.ToInt32(reader["TipAntikvitetaID"]) == Convert.ToInt32(TipAntikvitetaID.Text))
+                        {
+                            Tip.Text = reader["Tip"].ToString();
+                            ind = 1;
+                            MessageBox.Show("Tip Antikviteta postoji u bazi!");
+                            break;
+                        }
+                    }
+                }
+                if (ind == 0)
+                {
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Tip Antikviteta dodat u bazu!");
+                    Tip.Clear();
+                    TipAntikvitetaID.Clear();
+                }
+                
+                con.Close();
+                
+            }
+            catch (Exception greska)
+            {
+                MessageBox.Show(greska.ToString());
+            }
+        }
+
+        private void Obrisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B9B10.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("DELETE FROM Tip_Antikviteta WHERE TipAntikvitetaID={0}", Convert.ToInt32(TipAntikvitetaID.Text));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+                MessageBox.Show("Tip izbrisan iz baze!");
+                TipAntikvitetaID.Clear();
+            }
+            catch (Exception greska)
+            {
+                MessageBox.Show(greska.ToString());
+            }
+        }
+
+        private void Izmeni_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B9B10.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("UPDATE Tip_Antikviteta SET Tip='{0}' WHERE TipAntikvitetaID={1}",Tip.Text, Convert.ToInt32(TipAntikvitetaID.Text));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+                MessageBox.Show("Tip izmenjen u bazi!");
+                TipAntikvitetaID.Clear();
+                Tip.Clear();
+            }
+            catch (Exception greska)
+            {
+                MessageBox.Show(greska.ToString());} 
+
+Po arheologu:
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection Konekcija = new OleDbConnection();
+            Konekcija.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B9B10.accdb";
+            OleDbCommand Komanda = new OleDbCommand();
+            Komanda.Connection = Konekcija;
+            Komanda.CommandText = String.Format("SELECT Lokalitet.KoordinateDuzine, Lokalitet.KoordinateSirine FROM Lokalitet INNER JOIN(Arheolog INNER JOIN Antikvitet ON Arheolog.ArheologID = Antikvitet.ArheologID) ON Lokalitet.LokalitetID = Antikvitet.LokalitetID WHERE Arheolog.ArheologID={0}",Convert.ToInt32(ArheologID.Text));
+            Konekcija.Open();
+            DataSet Ds = new DataSet();
+            OleDbDataAdapter Da = new OleDbDataAdapter();
+            Da.SelectCommand = Komanda;
+            Da.Fill(Ds);
+            dataGridView1.DataSource = Ds.Tables[0];
+            Konekcija.Close();
+        }
+
+        private void Izadji_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Nacrtaj_Click(object sender, EventArgs e)
+        {
+            int selectedrowindex = dataGridView1.SelectedCells[0].RowIndex;
+            DataGridViewRow selectedRow = dataGridView1.Rows[selectedrowindex];
+            string a = Convert.ToString(selectedRow.Cells["KoordinateDuzine"].Value);
+            string b = Convert.ToString(selectedRow.Cells["KoordinateSirine"].Value);
+            string a1 = a.Substring(0, a.IndexOf(' ')), a2 = a.Substring(a.IndexOf(' ') + 1);
+            string b1 = b.Substring(0, b.IndexOf(' ')), b2 = b.Substring(b.IndexOf(' ') + 1);
+            int duzina, sirina;
+            if (String.Compare(a2, "istocno") == 0) duzina = Convert.ToInt32(a1); else duzina = -Convert.ToInt32(a1);
+            if (String.Compare(b2, "severno") == 0) sirina = Convert.ToInt32(b1); else sirina = -Convert.ToInt32(b1);
+            Pen olovka = new Pen(Color.Blue,2);
+            Pen olovka2 = new Pen(Color.Red, 2);
+            Graphics g = pictureBox1.CreateGraphics();
+            label7.Visible = true;
+            label4.Visible = true;
+            label12.Visible = true;
+            label10.Visible = true;
+            label9.Visible = true;
+            label13.Visible = true;
+            label8.Visible = true;
+            label3.Visible = true;
+            label10.Visible = true;
+            label2.Visible = true;
+            label6.Visible = true;
+            label11.Visible = true;
+            g.FillRectangle(Brushes.White, 0, 0, 360, 180);
+            g.DrawRectangle(olovka,0,0,360,180);
+            g.DrawLine(olovka, 0, 90, 360, 90);
+            g.DrawLine(olovka, 180, 0, 180, 180);
+            Rectangle elipsa = new Rectangle(180 + duzina, 90 -sirina, 3, 3);
+            g.DrawEllipse(olovka2, elipsa);
+            olovka.Dispose();
+            olovka2.Dispose();
+            g.Dispose();
+        }
+
+Periodi:
+private void Unesi_Click(object sender, EventArgs e)
+        {
+            int ind = 0;
+            OleDbConnection Konekcija = new OleDbConnection();
+            Konekcija.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B9B10.accdb";
+            OleDbCommand Komanda = new OleDbCommand();
+            Komanda.Connection = Konekcija;
+            Komanda.CommandText = string.Format("INSERT INTO Period VALUES({0},'{1}')", Convert.ToInt32(PeriodID.Text), Period.Text);
+            OleDbCommand Komandap = new OleDbCommand();
+            Komandap.Connection = Konekcija;
+            Komandap.CommandText = string.Format("SELECT * FROM Period WHERE PeriodID={0}", Convert.ToInt32(PeriodID.Text));
+            try
+            {
+                Konekcija.Open();
+                using (OleDbDataReader reader = Komandap.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (Convert.ToInt32(reader["PeriodID"]) == Convert.ToInt32(PeriodID.Text))
+                        {
+                            Period.Text = reader["Period"].ToString();
+                            ind = 1;
+                            MessageBox.Show("Period postoji u bazi!");
+                            break;
+                        }
+                    }
+                }
+                if (ind == 0)
+                {
+                    Komanda.ExecuteNonQuery();
+                    MessageBox.Show("Period dodat u bazu!");
+                    Period.Clear();
+                    PeriodID.Clear();
+                }
+
+                Konekcija.Close();
+
+            }
+            catch (Exception greska)
+            {
+                MessageBox.Show(greska.ToString());
+            }
+        }
+
+        private void Obrisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection Konekcija = new OleDbConnection();
+            Konekcija.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B9B10.accdb";
+            OleDbCommand Komanda = new OleDbCommand();
+            Komanda.Connection = Konekcija;
+            Komanda.CommandText = string.Format("DELETE FROM Period WHERE PeriodID={0}", Convert.ToInt32(PeriodID.Text));
+            try
+            {
+                Konekcija.Open();
+                Komanda.ExecuteNonQuery();
+                Konekcija.Close();
+                MessageBox.Show("Period izbrisan iz baze!");
+                PeriodID.Clear();
+            }
+            catch (Exception greska)
+            {
+                MessageBox.Show(greska.ToString());
+            }
+        }
+
+        private void Izmeni_Click(object sender, EventArgs e)
+        {
+            OleDbConnection Konekcija = new OleDbConnection();
+            Konekcija.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B9B10.accdb";
+            OleDbCommand Komanda = new OleDbCommand();
+            Komanda.Connection = Konekcija;
+            Komanda.CommandText = string.Format("UPDATE Period SET Period='{0}' WHERE PeriodID={1}", Period.Text, Convert.ToInt32(PeriodID.Text));
+            try
+            {
+                Konekcija.Open();
+                Komanda.ExecuteNonQuery();
+                Konekcija.Close();
+                MessageBox.Show("Period izmenjen u bazi!");
+                PeriodID.Clear();
+                Period.Clear();
+            }
+            catch (Exception greska)
+            {
+                MessageBox.Show(greska.ToString());
+            }
+        }
+Po antikvitetu:
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection Konekcija = new OleDbConnection();
+            Konekcija.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B9B10.accdb";
+            OleDbCommand Komanda = new OleDbCommand();
+            Komanda.Connection = Konekcija;
+            Komanda.CommandText = String.Format("SELECT Lokalitet.Naziv, Lokalitet.KoordinateDuzine, Lokalitet.KoordinateSirine FROM Tip_Antikviteta INNER JOIN(Lokalitet INNER JOIN Antikvitet ON Lokalitet.LokalitetID = Antikvitet.LokalitetID) ON Tip_Antikviteta.TipAntikvitetaID = Antikvitet.TipAntikvitetaID WHERE Tip_Antikviteta.Tip='{0}'", Naziv.Text);
+            Konekcija.Open();
+            DataSet Ds = new DataSet();
+            OleDbDataAdapter Da = new OleDbDataAdapter();
+            Da.SelectCommand = Komanda;
+            Da.Fill(Ds);
+            dataGridView1.DataSource = Ds.Tables[0];
+            Konekcija.Close();
+        }
+
+        private void Nacrtaj_Click(object sender, EventArgs e)
+        {
+            int selectedrowindex = dataGridView1.SelectedCells[0].RowIndex;
+            DataGridViewRow selectedRow = dataGridView1.Rows[selectedrowindex];
+            string a = Convert.ToString(selectedRow.Cells["KoordinateDuzine"].Value);
+            string b = Convert.ToString(selectedRow.Cells["KoordinateSirine"].Value);
+            string a1 = a.Substring(0, a.IndexOf(' ')), a2 = a.Substring(a.IndexOf(' ') + 1);
+            string b1 = b.Substring(0, b.IndexOf(' ')), b2 = b.Substring(b.IndexOf(' ') + 1);
+            int duzina, sirina;
+            if (String.Compare(a2, "istocno") == 0) duzina = Convert.ToInt32(a1); else duzina = -Convert.ToInt32(a1);
+            if (String.Compare(b2, "severno") == 0) sirina = Convert.ToInt32(b1); else sirina = -Convert.ToInt32(b1);
+            Pen olovka = new Pen(Color.Blue, 2);
+            Pen olovka2 = new Pen(Color.Red, 2);
+            Graphics g = pictureBox1.CreateGraphics();
+            g.DrawRectangle(olovka, 0, 0, 360, 180);
+            g.DrawLine(olovka, 0, 90, 360, 90);
+            g.DrawLine(olovka, 180, 0, 180, 180);
+            g.FillRectangle(Brushes.White, 0, 0, 360, 180);
+            g.DrawRectangle(olovka, 0, 0, 360, 180);
+            g.DrawLine(olovka, 0, 90, 360, 90);
+            g.DrawLine(olovka, 180, 0, 180, 180);
+            Rectangle elipsa = new Rectangle(180 + duzina, 90 - sirina, 3, 3);
+            g.DrawEllipse(olovka2, elipsa);
+            olovka.Dispose();
+            olovka2.Dispose();
+            g.Dispose();
+        }
+B33B34:
+Igraci:  *globalno*
+OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B33B34.accdb");
+        int grad;
+private void Igraci_Load(object sender, EventArgs e)
+        {
+            comboBox1.Items.Clear();
+            comboBox2.Items.Clear();
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Igrac";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox1.Items.Add(reader["IgracID"].ToString());
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Grad ORDER BY Grad";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox2.Items.Add(reader["Grad"].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void NOVI_Click(object sender, EventArgs e)
+        {
+            textBox1.Clear();
+            textBox2.Clear();
+            textBox3.Clear();
+            textBox4.Clear();
+            maskedTextBox1.Clear();
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT COUNT(IgracID) AS IZBROJ FROM Igrac";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                comboBox1.Text = (Convert.ToInt32(reader["IZBROJ"])+1).ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void Upisi_Click(object sender, EventArgs e)
+        {
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM Grad WHERE Grad='{0}'",comboBox2.SelectedItem);
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) grad = Convert.ToInt32(reader["GradID"]);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("INSERT INTO Igrac VALUES({0},'{1}','{2}','{3}','{4}','{5}',{6})", Convert.ToInt32(comboBox1.Text),textBox1.Text,textBox2.Text,textBox3.Text,textBox4.Text,maskedTextBox1.Text,grad);
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("USPESNO UNET IGRAC");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+                Igraci f = new Igraci();
+                f.Show();
+                this.Close();
+            }
+        }
+private void Obrisi_Click(object sender, EventArgs e)
+        {
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("DELETE FROM Igrac WHERE IgracID={0}", Convert.ToInt32(comboBox1.Text));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("USPESNO OBRISAN IGRAC");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+                Igraci f = new Igraci();
+                f.Show();
+                this.Close();
+            }
+        }
+private void Izmeni_Click(object sender, EventArgs e)
+        {
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM Grad WHERE Grad='{0}'", comboBox2.SelectedItem);
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) grad = Convert.ToInt32(reader["GradID"]);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("UPDATE Igrac SET Ime='{0}',Prezime='{1}',Adresa='{2}',Email='{3}',Telefon='{4}',GradID={5} WHERE IgracID={6}", textBox1.Text,textBox2.Text,textBox3.Text,textBox4.Text,maskedTextBox1.Text,grad,Convert.ToInt32(comboBox1.SelectedItem));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("USPESNO IZMENJEN IGRAC");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+                Igraci f = new Igraci();
+                f.Show();
+                this.Close();
+            }
+        }
+private void ComboSifra_SelectedIndexChanged()
+        {
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT Igrac.Ime,Igrac.Prezime,Igrac.Adresa,Igrac.Email,Igrac.Telefon, Grad.Grad FROM Igrac,Grad WHERE Igrac.GradID=Grad.GradID AND Igrac.IgracID={0}",comboBox1.SelectedItem);
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                textBox1.Text = reader["Ime"].ToString();
+                textBox2.Text = reader["Prezime"].ToString();
+                textBox3.Text = reader["Adresa"].ToString();
+                comboBox2.Text = reader["Grad"].ToString();
+                textBox4.Text = reader["Email"].ToString();
+                maskedTextBox1.Text = reader["Telefon"].ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+
+private void SpisakIgraca_Load(object sender, EventArgs e)
+        {
+
+            for (int i = 1; i <= 12; i++)
+            {
+                comboBox2.Items.Add(i.ToString());
+                comboBox4.Items.Add(i.ToString());
+
+            }
+            for (int i = 1; i <= 31; i++)
+            {
+                comboBox1.Items.Add(i.ToString());
+                comboBox3.Items.Add(i.ToString());
+
+            }
+        }
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            DateTime datum1 = Convert.ToDateTime(comboBox2.SelectedItem.ToString() + "/" + comboBox1.SelectedItem.ToString() + "/" + textBox2.Text);
+            DateTime datum2 = Convert.ToDateTime(comboBox4.SelectedItem.ToString() + "/" + comboBox3.SelectedItem.ToString() + "/" + textBox2.Text);
+            OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B33B34.accdb");
+            string select = "Select Teren.TerenID, Teren.Teren, Count(Partija.TerenID) AS [Broj partija] From Teren, Partija Where Teren.TerenID=Partija.TerenID And Partija.Datum Between #" + datum1.ToShortDateString() + "# And #" + datum2.ToShortDateString() + "# Group By Teren.TerenID, Teren.Teren";
+            OleDbDataAdapter da = new OleDbDataAdapter(select, con);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            dataGridView1.DataSource = dt;
+        }
+private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            listView1.Items.Clear();
+            OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B33B34.accdb");
+            DateTime datum1 = Convert.ToDateTime(comboBox2.SelectedItem.ToString() + "/" + comboBox1.SelectedItem.ToString() + "/" + textBox2.Text);
+            DateTime datum2 = Convert.ToDateTime(comboBox4.SelectedItem.ToString() + "/" + comboBox3.SelectedItem.ToString() + "/" + textBox2.Text);
+
+            string select = "Select PartijaID, Format(Datum, 'Short Date') From Partija Where TerenID=@TerenID And Datum Between #" + datum1.ToShortDateString() + "# And #" + datum2.ToShortDateString() + "# Order By Datum, PartijaID";
+            if (dataGridView1.SelectedRows.Count == 1)
+            {
+                int sifra = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[0].Value);
+                OleDbCommand cmd = new OleDbCommand(select, con);
+                cmd.Parameters.AddWithValue("TerenID", sifra);
+                DataTable dt = new DataTable();
+                OleDbDataAdapter da = new OleDbDataAdapter();
+                da.SelectCommand = cmd;
+                da.Fill(dt);
+                foreach (DataRow row in dt.Rows)
+                {
+                    ListViewItem item = new ListViewItem(row[0].ToString());
+                    for (int i = 1; i < dt.Columns.Count; i++)
+                    {
+                        item.SubItems.Add(row[i].ToString());
+                    }
+                    listView1.Items.Add(item);
+                }
+            }
+        }
+
+private void SpisakPartija_Load(object sender, EventArgs e)
+        {
+            label3.Visible = false;
+            OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B33B34.accdb");
+
+            string poc = "Select Distinct Format(VremePocetka, 'Short Time') From Partija";
+            OleDbCommand cmd1 = new OleDbCommand(poc, con);
+            con.Open();
+            OleDbDataReader dr1 = cmd1.ExecuteReader();
+
+            while (dr1.Read())
+                comboBox1.Items.Add(dr1.GetValue(0).ToString());
+
+
+            string kraj = "Select Distinct Format(VremeZavrsetka, 'Short Time') From Partija";
+            OleDbCommand cmd2 = new OleDbCommand(kraj, con);
+            OleDbDataReader dr2 = cmd2.ExecuteReader();
+            while (dr2.Read())
+                comboBox2.Items.Add(dr2.GetValue(0).ToString());
+
+            con.Close();  }
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            DateTime prvi = Convert.ToDateTime(comboBox1.SelectedItem);
+            DateTime drugi = Convert.ToDateTime(comboBox2.SelectedItem);
+            string select = "Select Partija.PartijaID, Teren.Teren, Format(Partija.Datum, 'Short Date') AS Datum, DateDiff('n', [VremePocetka], [VremeZavrsetka]) AS [Trajanje / min] From Partija, Teren Where VremePocetka>=#" + prvi.ToLongTimeString() + "# And VremeZavrsetka<=#" + drugi.ToLongTimeString() + "# And Partija.TerenID=Teren.TerenID";
+            OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B33B34.accdb");
+            OleDbCommand cmd = new OleDbCommand(select, con);
+            OleDbDataAdapter da = new OleDbDataAdapter();
+            da.SelectCommand = cmd;
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            dataGridView1.DataSource = dt;
+        }
+private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count == 1)
+            {
+                OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B33B34.accdb");
+                DataGridViewRow red = dataGridView1.SelectedRows[0];
+                int id_partije = Convert.ToInt32(red.Cells[0].Value);
+                string select = "Select Teren.Teren, Teren.Adresa, Grad.Grad, Teren.KontaktTelefon From Partija, Teren, Grad Where Partija.PartijaID=@Partija.PartijaID AND Grad.GradID=Teren.GradID AND Partija.TerenID=Teren.TerenID";
+                OleDbCommand cmd = new OleDbCommand(select, con);
+                cmd.Parameters.AddWithValue("Partija.PartijaID", id_partije);
+                con.Open();
+                OleDbDataReader dr = cmd.ExecuteReader();
+                label3.Visible = true;
+                while (dr.Read())
+                {
+                    label3.Text = dr.GetString(0) + " | " + dr.GetString(1) + " | " + dr.GetString(2) + " | " + dr.GetString(3);
+                }
+                con.Close();  }  }
+*globalno*
+OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B33B34.accdb");
+        int grad;
+
+private void Tereni_Load(object sender, EventArgs e)
+        {
+            comboBox1.Items.Clear();
+            comboBox2.Items.Clear();
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Teren";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox1.Items.Add(reader["TerenID"].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Grad ORDER BY Grad";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox2.Items.Add(reader["Grad"].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void Novi_Click(object sender, EventArgs e)
+        {
+            textBox1.Clear();
+            textBox2.Clear();
+            maskedTextBox1.Clear();
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT COUNT(TerenID) AS IZBROJ FROM Teren";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                comboBox1.Text = (Convert.ToInt32(reader["IZBROJ"]) + 1).ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void Upisi_Click(object sender, EventArgs e)
+        {
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM Grad WHERE Grad='{0}'", comboBox2.SelectedItem);
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) grad = Convert.ToInt32(reader["GradID"]);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("INSERT INTO Teren VALUES({0},'{1}','{2}',{3},'{4}')", Convert.ToInt32(comboBox1.Text), textBox1.Text, textBox2.Text, grad, maskedTextBox1.Text);
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("USPESNO UNET TEREN");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+                Tereni f = new Tereni();
+                f.Show();
+                this.Close();
+            }
+        }
+
+private void Obrisi_Click(object sender, EventArgs e)
+        {
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("DELETE FROM Teren WHERE TerenID={0}", Convert.ToInt32(comboBox1.Text));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("USPESNO OBRISAN TEREN");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+                Tereni f = new Tereni();
+                f.Show();
+                this.Close();
+            }
+        }
+private void Izmeni_Click(object sender, EventArgs e)
+        {
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM Grad WHERE Grad='{0}'", comboBox2.SelectedItem);
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) grad = Convert.ToInt32(reader["GradID"]);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("UPDATE Teren SET Teren='{0}',Adresa='{1}',GradID={2},KontaktTelefon='{3}' WHERE TerenID={4}",textBox1.Text,textBox2.Text,grad,maskedTextBox1.Text,Convert.ToInt32(comboBox1.SelectedItem));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("USPESNO IZMENJEN TEREN");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+                Tereni f = new Tereni();
+                f.Show();
+                this.Close();
+            }
+        }
+private void ComboSifra_SelectedIndexChanged()
+        {
+
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT Teren.Teren,Teren.Adresa,Grad.Grad,Teren.KontaktTelefon FROM Teren,Grad WHERE Teren.GradID=Grad.GradID AND Teren.TerenID={0}", Convert.ToInt32(comboBox1.SelectedItem));
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                textBox1.Text = reader["Teren"].ToString();
+                textBox2.Text = reader["Adresa"].ToString();
+                comboBox2.Text = reader["Grad"].ToString();
+                maskedTextBox1.Text = reader["KontaktTelefon"].ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+
+B13B14:
+private void Unos_knjiga_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B13B14.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM KNJIGA";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox1.Items.Add(reader["Naziv"].ToString());
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            //kategorija
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM KATEGORIJA";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) comboBox2.Items.Add(reader["Naziv"].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void RadioBtnUpis_CheckedChanged(object sender, EventArgs e)
+        {
+     //za RadioBtnBrisanje su / vrednosti
+        button1.Enabled = true;  /false
+        button2.Enabled = false; /true
+        comboBox1.Enabled = true; /false
+        comboBox2.Enabled = true; /false
+        textBox1.Enabled = true;  -
+        textBox2.Enabled = true;  /false
+        textBox3.Enabled = true;  /false
+        textBox1.Clear();
+        textBox2.Clear();
+        textBox3.Clear();
+        comboBox1.Text = "";
+        comboBox2.Text = "";
+        }
+private void Upisi_Click(object sender, EventArgs e)
+        {
+            
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B13B14.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM KATEGORIJA WHERE Naziv='{0}'",comboBox2.SelectedItem);
+            con.Open();
+            OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    b = Convert.ToInt32(reader["KategorijaID"]);
+                }
+            con.Close();
+            cmd.Dispose();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("INSERT INTO KNJIGA(KnjigaID,Naziv,BrojStrana,KategorijaID,Komentar) VALUES({0},'{1}',{2},{3},'{4}')", Convert.ToInt32(textBox1.Text), comboBox1.Text, Convert.ToInt32(textBox2.Text),b,textBox3.Text);
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Upisana knjiga");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void Obrisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B13B14.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT KNJIGA.KnjigaID, KNJIGA.Naziv, KNJIGA.BrojStrana, KATEGORIJA.Naziv as ime, KNJIGA.Komentar FROM KATEGORIJA INNER JOIN KNJIGA ON KATEGORIJA.KategorijaID = KNJIGA.KategorijaID WHERE KNJIGA.KnjigaID ={0}", Convert.ToInt32(textBox1.Text));
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    comboBox1.Text = reader["Naziv"].ToString();
+                    textBox2.Text = reader["BrojStrana"].ToString();
+                    comboBox2.Text = reader["ime"].ToString();
+                    textBox3.Text = reader["Komentar"].ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("DELETE FROM KNJIGA WHERE KnjigaID={0}",Convert.ToInt32(textBox1.Text));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspeno obrisana knjiga");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+Unos autora:
+private void RadioBtnUpisi_CheckedChanged(object sender, EventArgs e)
+        {
+     //za RadioBtnBrisanje su / vrednosti
+            button1.Enabled = true; /false
+            button2.Enabled = false; /true
+            textBox1.Enabled = true; -
+            textBox2.Enabled = true; /false
+            textBox3.Enabled = true; /false
+         dateTimePicker1.Enabled = true; /false
+        }
+
+
+
+private void Upisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B13B14.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("INSERT INTO AUTOR VALUES({0},'{1}','{2}',#{3}#)", Convert.ToInt32(textBox1.Text), textBox2.Text, textBox3.Text, dateTimePicker1.Value.ToShortDateString());
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno unesen autor");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+                cmd.Dispose();
+            }
+        }
+private void Obrisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B13B14.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT * FROM AUTOR");
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    textBox2.Text = reader["Ime"].ToString();
+                    textBox3.Text = reader["Prezime"].ToString();
+                    dateTimePicker1.Value = Convert.ToDateTime(reader["DatumRodjenja"]);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("DELETE FROM AUTOR WHERE AutorID={0}",Convert.ToInt32(textBox1.Text));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno izbrisan autor");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+                cmd.Dispose();
+            }
+        }
+
+private void Po_autorima_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B13B14.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM AUTOR ORDER BY Ime,Prezime";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) checkedListBox1.Items.Add(reader["Ime"].ToString()+" "+reader["Prezime"].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }   }
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            string k1, k2, k3;
+            OleDbDataAdapter Da = new OleDbDataAdapter();
+            DataTable dt1 = new DataTable();
+            DataTable dt2 = new DataTable();
+            DataTable dt3 = new DataTable();
+            k1 = checkedListBox1.CheckedItems[0].ToString();
+            k2 = checkedListBox1.CheckedItems[1].ToString();
+            k3 = checkedListBox1.CheckedItems[2].ToString();
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B13B14.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            string ime1, prezime1;
+            ime1 = k1.Substring(0, k1.IndexOf(' '));
+            prezime1 = k1.Substring(k1.IndexOf(' ') + 1);
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("Select AUTOR.Ime, Count(AUTOR_IZDANJE.AutorID) As Broj FROM AUTOR, AUTOR_IZDANJE Where AUTOR.AutorID=AUTOR_IZDANJE.AutorID And AUTOR.Ime='{0}' And AUTOR.Prezime='{1}' Group By AUTOR.Ime",ime1,prezime1);
+            try
+            {
+                con.Open();
+                Da.SelectCommand = cmd;
+                Da.Fill(dt1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+
+            ime1 = k2.Substring(0, k2.IndexOf(' '));
+            prezime1 = k2.Substring(k2.IndexOf(' ') + 1);
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("Select AUTOR.Ime, Count(AUTOR_IZDANJE.AutorID) As Broj FROM AUTOR, AUTOR_IZDANJE Where AUTOR.AutorID=AUTOR_IZDANJE.AutorID And AUTOR.Ime='{0}' And AUTOR.Prezime='{1}' Group By AUTOR.Ime", ime1, prezime1);
+            try
+            {
+                con.Open();
+                Da.SelectCommand = cmd;
+                Da.Fill(dt2);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+
+            ime1 = k3.Substring(0, k3.IndexOf(' '));
+            prezime1 = k3.Substring(k3.IndexOf(' ') + 1);
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("Select AUTOR.Ime, Count(AUTOR_IZDANJE.AutorID) As Broj FROM AUTOR, AUTOR_IZDANJE Where AUTOR.AutorID=AUTOR_IZDANJE.AutorID And AUTOR.Ime='{0}' And AUTOR.Prezime='{1}' Group By AUTOR.Ime", ime1, prezime1);
+            try
+            {
+                con.Open();
+                Da.SelectCommand = cmd;
+                Da.Fill(dt3);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            dt1.Merge(dt2);
+            dt1.Merge(dt3);
+            chart1.DataSource = dt1;
+            chart1.Series["Broj knjiga"].XValueMember = "Ime";
+            chart1.Series["Broj knjiga"].YValueMembers = "Broj";
+  
+            chart1.DataBind();
+        }
+
+
+
+
+
+
+
+*globalne*
+int b1, b2, b3;
+
+private void Po_kategorijama_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B13B14.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM KATEGORIJA ORDER BY Naziv ASC";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read()) checkedListBox1.Items.Add(reader["Naziv"].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            string k1, k2, k3;
+            OleDbDataAdapter Da = new OleDbDataAdapter();
+            DataTable dt1 = new DataTable();
+            DataTable dt2 = new DataTable();
+            DataTable dt3 = new DataTable();
+            k1 = checkedListBox1.CheckedItems[0].ToString();
+            k2 = checkedListBox1.CheckedItems[1].ToString();
+            k3 = checkedListBox1.CheckedItems[2].ToString();
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B13B14.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT KATEGORIJA.Naziv as Ime, Count(KNJIGA.KategorijaID) AS Broj FROM KATEGORIJA INNER JOIN KNJIGA ON KATEGORIJA.KategorijaID = KNJIGA.KategorijaID WHERE KATEGORIJA.Naziv='{0}' GROUP BY KATEGORIJA.Naziv", k1);
+            try
+            {
+                con.Open();
+                Da.SelectCommand = cmd;
+                Da.Fill(dt1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT KATEGORIJA.Naziv as Ime, Count(KNJIGA.KategorijaID) AS Broj FROM KATEGORIJA INNER JOIN KNJIGA ON KATEGORIJA.KategorijaID = KNJIGA.KategorijaID WHERE KATEGORIJA.Naziv='{0}' GROUP BY KATEGORIJA.Naziv", k2);
+            try
+            {
+                con.Open();
+                Da.SelectCommand = cmd;
+                Da.Fill(dt2);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("SELECT KATEGORIJA.Naziv as Ime, Count(KNJIGA.KategorijaID) AS Broj FROM KATEGORIJA INNER JOIN KNJIGA ON KATEGORIJA.KategorijaID = KNJIGA.KategorijaID WHERE KATEGORIJA.Naziv='{0}' GROUP BY KATEGORIJA.Naziv", k3);
+            try
+            {
+                con.Open();
+                Da.SelectCommand = cmd;
+                Da.Fill(dt2);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+            dt1.Merge(dt2);
+            dt1.Merge(dt3);
+            chart1.DataSource = dt1;
+            chart1.Series["Broj knjiga"].XValueMember = "Ime";
+            chart1.Series["Broj knjiga"].YValueMembers = "Broj";
+            chart1.ChartAreas[0].AxisX.LabelStyle.Angle = 90;
+            chart1.DataBind();
+        }
+
+B27B28:
+*Broj dece*
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B27B28.accdb");
+            string upit = "Select Roditelj.Ime, Roditelj.Prezime, Adresa, Svojstvo From Roditelj, Dete, Pol, Svojstvo_Roditelja Where Dete.PolID=Pol.PolID And Roditelj.RoditeljID=Dete.RoditeljID And Svojstvo_Roditelja.SvojstvoID=Roditelj.SvojstvoID";
+            if (checkBox1.Checked && checkBox2.Checked && checkBox3.Checked)
+                upit += " And (Roditelj.SvojstvoID=1 Or Roditelj.SvojstvoID=2 OR Roditelj.SvojstvoID=3)";
+
+            else if (checkBox1.Checked && checkBox2.Checked && checkBox3.Checked == false)
+                upit += " And (Roditelj.SvojstvoID=1 Or Roditelj.SvojstvoID=2)";
+
+            else if (checkBox2.Checked && checkBox3.Checked && checkBox1.Checked == false)
+                upit += " And (Roditelj.SvojstvoID=2 Or Roditelj.SvojstvoID=3 )";
+            else if (checkBox3.Checked && checkBox1.Checked && checkBox2.Checked == false)
+                upit += " And (Roditelj.SvojstvoID=3 Or Roditelj.SvojstvoID=1)";
+
+            else if (checkBox1.Checked && checkBox2.Checked == false && checkBox3.Checked == false)
+                upit += " And Roditelj.SvojstvoID=1";
+
+            else if (checkBox2.Checked && checkBox1.Checked == false && checkBox3.Checked == false)
+                upit += " And Roditelj.SvojstvoID=2";
+            else if (checkBox3.Checked && checkBox1.Checked == false && checkBox2.Checked == false)
+                upit += " And Roditelj.SvojstvoID=3";
+
+            if (checkBox4.Checked && checkBox5.Checked)
+                upit += " And (Dete.PolID=1 Or Dete.PolID=2)";
+            else if (checkBox4.Checked && checkBox5.Checked == false)
+                upit += " And Dete.PolID=1";
+            else if (checkBox5.Checked && checkBox4.Checked == false)
+                upit += " And Dete.PolID=2";
+
+            upit += " Group By roditelj.Ime, Roditelj.Prezime, Adresa, Svojstvo Having Count(Dete.RoditeljID)=" + numericUpDown1.Value.ToString();
+            OleDbDataAdapter da = new OleDbDataAdapter(upit, con);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            dataGridView1.DataSource = ds.Tables[0];
+        }
+
+*globalno*
+OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B27B28.accdb");
+
+private void Deca_Load(object sender, EventArgs e)
+        {
+            textBox1.Enabled = true;
+            textBox2.Enabled = true;
+            textBox3.Enabled = true;
+            textBox4.Enabled = true;
+            maskedTextBox1.Enabled = true;
+            radioButton1.Enabled = true;
+            radioButton2.Enabled = true;
+            button5.Enabled = true;
+            button3.Enabled = false;
+            button2.Enabled = false;
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Roditelj";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    comboBox1.Items.Add(reader["RoditeljID"].ToString() + "-" + reader["Ime"].ToString() + " " + reader["Prezime"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+
+private void Novi_Click(object sender, EventArgs e)
+        {
+            textBox1.Enabled = false;
+            textBox2.Enabled = true; textBox2.Clear();
+            textBox3.Enabled = true; textBox3.Clear();
+            textBox4.Enabled = true; textBox4.Clear();
+            maskedTextBox1.Enabled = true; maskedTextBox1.Clear();
+            radioButton1.Enabled = true;
+            radioButton2.Enabled = true;
+            button2.Enabled = true;
+            button3.Enabled = true;
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT COUNT(DeteID) AS IZBROJ FROM Dete";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                int broj = Convert.ToInt32(reader["IZBROJ"]) + 1;
+                textBox1.Text = broj.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void Unesi_Click(object sender, EventArgs e)
+        {
+            int rid;string s = comboBox1.Text;
+            rid = Convert.ToInt32(s.Substring(0, s.IndexOf('-')));
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con; 
+            if (radioButton1.Checked == true)
+                cmd.CommandText = string.Format("INSERT INTO Dete VALUES({0},{1},'{2}','{3}',#{4}#,'{5}',{6})", Convert.ToInt32(textBox1.Text), 1, textBox2.Text, textBox3.Text, maskedTextBox1.Text,textBox4.Text,rid);
+            if (radioButton2.Checked == true)
+                cmd.CommandText = string.Format("INSERT INTO Dete VALUES({0},{1},'{2}','{3}',#{4}#,'{5}',{6})", Convert.ToInt32(textBox1.Text), 2, textBox2.Text, textBox3.Text, maskedTextBox1.Text, textBox4.Text, rid);
+
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("USPESNO UNESEN RODITELJ");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+                Deca r = new Deca();
+                r.Show();
+                this.Close();
+            }
+        }
+private void Prethodni_Click(object sender, EventArgs e)
+        {
+            int sifra;
+            radioButton1.Checked = false;
+            radioButton2.Checked = false;
+            if (String.Compare(textBox1.Text, "") == 0) sifra = 0;
+            else sifra = Convert.ToInt32(textBox1.Text);
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Dete";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                if (sifra != 0)
+                {
+                    reader.Read();
+                    while (Convert.ToInt32(reader["DeteID"]) < sifra - 1) reader.Read();
+                    textBox1.Text = reader["DeteID"].ToString();
+                    textBox2.Text = reader["Ime"].ToString();
+                    textBox3.Text = reader["Prezime"].ToString();
+                    textBox4.Text = reader["Beleske"].ToString();
+                    int rbr = Convert.ToInt32(reader["RoditeljID"]) - 1;
+                    comboBox1.SelectedItem = comboBox1.Items[rbr];
+                    DateTime d = Convert.ToDateTime(reader["DatumRodjenja"]);
+                    string datum; if (d.Day < 10) datum = "0" + d.Day + "/"; else datum = d.Day + "/";
+                    if (d.Month < 10) datum = datum + "0" + d.Month + "/"; else datum = datum + d.Month + "/";
+                    datum = datum + d.Year;
+                    maskedTextBox1.Text = datum;
+                    int brojka = Convert.ToInt32(reader["PolID"]);
+                    if (brojka == 1) radioButton1.Checked = true;
+                    if (brojka == 2) radioButton2.Checked = true;
+                }
+                else
+                {
+                    reader.Read();
+                    textBox1.Text = reader["DeteID"].ToString();
+                    textBox2.Text = reader["Ime"].ToString();
+                    textBox3.Text = reader["Prezime"].ToString();
+                    textBox4.Text = reader["Beleske"].ToString();
+                    int rbr = Convert.ToInt32(reader["RoditeljID"]) - 1;
+                    comboBox1.SelectedItem = comboBox1.Items[rbr];
+                    DateTime d = Convert.ToDateTime(reader["DatumRodjenja"]);
+                    string datum; if (d.Day < 10) datum = "0" + d.Day + "/"; else datum = d.Day + "/";
+                    if (d.Month < 10) datum = datum + "0" + d.Month + "/"; else datum = datum + d.Month + "/";
+                    datum = datum + d.Year;
+                    maskedTextBox1.Text = datum;
+                    int brojka = Convert.ToInt32(reader["PolID"]);
+                    if (brojka == 1) radioButton1.Checked = true;
+                    if (brojka == 2) radioButton2.Checked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void Sledeci_Click(object sender, EventArgs e)
+        {
+            int sifra;
+            button3.Enabled = true;
+            radioButton1.Checked = false;
+            radioButton2.Checked = false;
+            if (String.Compare(textBox1.Text,"") == 0) sifra = 0;
+            else sifra = Convert.ToInt32(textBox1.Text);
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Dete";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                if (sifra == 0)
+                {
+                    while (reader.Read())
+                    {
+                        textBox1.Text = reader["DeteID"].ToString();
+                        textBox2.Text = reader["Ime"].ToString();
+                        textBox3.Text = reader["Prezime"].ToString();
+                        textBox4.Text = reader["Beleske"].ToString();
+                        int rbr = Convert.ToInt32(reader["RoditeljID"]) - 1;
+                        comboBox1.SelectedItem = comboBox1.Items[rbr];
+                        DateTime d = Convert.ToDateTime(reader["DatumRodjenja"]);
+                        string datum; if (d.Day < 10) datum = "0" + d.Day + "/"; else datum = d.Day+"/";
+                        if (d.Month < 10) datum = datum + "0" + d.Month + "/"; else datum = datum + d.Month + "/";
+                        datum = datum + d.Year;
+                        maskedTextBox1.Text =datum;
+                        int brojka = Convert.ToInt32(reader["PolID"]);
+                        if (brojka == 1) radioButton1.Checked = true;
+                        if (brojka == 2) radioButton2.Checked = true;
+                    }
+                }
+                else
+                {
+                    reader.Read();
+                    while (Convert.ToInt32(reader["DeteID"]) < sifra + 1) reader.Read();
+                    textBox1.Text = reader["DeteID"].ToString();
+                    textBox2.Text = reader["Ime"].ToString();
+                    textBox3.Text = reader["Prezime"].ToString();
+                    textBox4.Text = reader["Beleske"].ToString();
+                    int rbr = Convert.ToInt32(reader["RoditeljID"]) - 1;
+                    comboBox1.SelectedItem = comboBox1.Items[rbr];
+                    DateTime d = Convert.ToDateTime(reader["DatumRodjenja"]);
+                    string datum; if (d.Day < 10) datum = "0" + d.Day + "/"; else datum = d.Day + "/";
+                    if (d.Month < 10) datum = datum + "0" + d.Month + "/"; else datum = datum + d.Month + "/";
+                    datum = datum + d.Year;
+                    maskedTextBox1.Text = datum;
+                    int brojka = Convert.ToInt32(reader["PolID"]);
+                    if (brojka == 1) radioButton1.Checked = true;
+                    if (brojka == 2) radioButton2.Checked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void Nacrtaj_Click(object sender, EventArgs e)
+        {
+            Graphics g = pictureBox1.CreateGraphics();
+
+            Pen p = new Pen(Color.Blue, 2);
+            Pen p1 = new Pen(Color.Red, 2);
+            Pen p2 = new Pen(Color.Green, 2);
+            g.DrawEllipse(p, 50, 50, 50, 50);
+            g.DrawRectangle(p2, 50, 100, 50, 50);
+            Point A = new Point(50, 100);
+            Point B = new Point(20, 50);
+            Point C = new Point(100, 100);
+            Point D = new Point(130, 150);
+            Point E = new Point(60, 150);
+            Point F = new Point(60, 200);
+            Point G = new Point(90, 150);
+            Point H = new Point(90, 200);
+            g.DrawLine(p1, A, B);
+            g.DrawLine(p1, C, D);
+            g.DrawLine(p1, E, F);
+            g.DrawLine(p1, G, H);
+            g.Dispose();
+            button5.Enabled = false;
+        }
+
+*globalno*
+OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B27B28.accdb");
+        
+private void Roditelji_Load(object sender, EventArgs e)
+        {
+            textBox1.Enabled =true;
+            textBox2.Enabled = true;
+            textBox3.Enabled = true;
+            textBox4.Enabled = true;
+            maskedTextBox1.Enabled = true;
+            maskedTextBox2.Enabled = true;
+            radioButton1.Enabled = true;
+            radioButton2.Enabled = true;
+            radioButton3.Enabled = true;
+            button5.Enabled = true;
+        }
+private void Novi_Click(object sender, EventArgs e)
+        {
+            textBox1.Enabled = false;
+            textBox2.Enabled = true;textBox2.Clear();
+            textBox3.Enabled = true;textBox3.Clear();
+            textBox4.Enabled = true;textBox4.Clear();
+            maskedTextBox1.Enabled = true;maskedTextBox1.Clear();
+            maskedTextBox2.Enabled = true;maskedTextBox2.Clear();
+            radioButton1.Enabled = true;
+            radioButton2.Enabled = true;
+            radioButton3.Enabled = true;
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT COUNT(RoditeljID) AS IZBROJ FROM Roditelj";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                int broj = Convert.ToInt32(reader["IZBROJ"])+1;
+                textBox1.Text = broj.ToString();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void Unesi_Click(object sender, EventArgs e)
+        {
+  OleDbCommand cmd = new OleDbCommand();
+                cmd.Connection = con;
+            if(radioButton1.Checked==true)
+                cmd.CommandText = string.Format("INSERT INTO Roditelj VALUES({0},{1},'{2}','{3}','{4}','{5}','{6}')",Convert.ToInt32(textBox1.Text),1,textBox2.Text,textBox3.Text,textBox4.Text,maskedTextBox1.Text,maskedTextBox2.Text);
+            if(radioButton2.Checked==true)
+                cmd.CommandText = string.Format("INSERT INTO Roditelj VALUES({0},{1},'{2}','{3}','{4}','{5}','{6}')", Convert.ToInt32(textBox1.Text), 2, textBox2.Text, textBox3.Text, textBox4.Text, maskedTextBox1.Text, maskedTextBox2.Text);
+            if(radioButton3.Checked==true)
+                cmd.CommandText = string.Format("INSERT INTO Roditelj VALUES({0},{1},'{2}','{3}','{4}','{5}','{6}')", Convert.ToInt32(textBox1.Text), 3, textBox2.Text, textBox3.Text, textBox4.Text, maskedTextBox1.Text, maskedTextBox2.Text);
+            try
+            {   con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("USPESNO UNESEN RODITELJ");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+                Roditelji r = new Roditelji();
+                r.Show();
+            }        }
+private void Prethodni_Click(object sender, EventArgs e)
+        {
+            int sifra;
+            radioButton1.Checked = false;
+            radioButton2.Checked = false;
+            radioButton3.Checked = false;
+            if (String.Compare(textBox1.Text, "") == 0) sifra = 0;
+            else sifra = Convert.ToInt32(textBox1.Text);
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Roditelj";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                if (sifra != 0)
+                {
+                    reader.Read();
+                    while (Convert.ToInt32(reader["RoditeljID"]) < sifra - 1) reader.Read();
+                    textBox1.Text = reader["RoditeljID"].ToString();
+                    textBox2.Text = reader["Ime"].ToString();
+                    textBox3.Text = reader["Prezime"].ToString();
+                    textBox4.Text = reader["Adresa"].ToString();
+                    maskedTextBox1.Text = reader["FiksniTelefon"].ToString();
+                    maskedTextBox2.Text = reader["MobilniTelefon"].ToString();
+                    int brojka = Convert.ToInt32(reader["SvojstvoID"]);
+                    if (brojka == 1) radioButton1.Checked = true;
+                    if (brojka == 2) radioButton2.Checked = true;
+                    if (brojka == 3) radioButton3.Checked = true;
+                }
+                else
+                {
+                    reader.Read();
+                    textBox1.Text = reader["RoditeljID"].ToString();
+                    textBox2.Text = reader["Ime"].ToString();
+                    textBox3.Text = reader["Prezime"].ToString();
+                    textBox4.Text = reader["Adresa"].ToString();
+                    maskedTextBox1.Text = reader["FiksniTelefon"].ToString();
+                    maskedTextBox2.Text = reader["MobilniTelefon"].ToString();
+                    int brojka = Convert.ToInt32(reader["SvojstvoID"]);
+                    if (brojka == 1) radioButton1.Checked = true;
+                    if (brojka == 2) radioButton2.Checked = true;
+                    if (brojka == 3) radioButton3.Checked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void Sledeci_Click(object sender, EventArgs e)
+        {
+            int sifra;
+            radioButton1.Checked = false;
+            radioButton2.Checked = false;
+            radioButton3.Checked = false;
+            if (String.Compare(textBox1.Text, "") == 0) sifra = 0;
+            else sifra = Convert.ToInt32(textBox1.Text);
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Roditelj";
+            try
+            {
+                con.Open();
+                OleDbDataReader reader = cmd.ExecuteReader();
+                if (sifra == 0)
+                {
+                    while (reader.Read())
+                    {
+                        textBox1.Text = reader["RoditeljID"].ToString();
+                        textBox2.Text = reader["Ime"].ToString();
+                        textBox3.Text = reader["Prezime"].ToString();
+                        textBox4.Text = reader["Adresa"].ToString();
+                        maskedTextBox1.Text = reader["FiksniTelefon"].ToString();
+                        maskedTextBox2.Text = reader["MobilniTelefon"].ToString();
+                        int brojka = Convert.ToInt32(reader["SvojstvoID"]);
+                        if (brojka == 1) radioButton1.Checked = true;
+                        if (brojka == 2) radioButton2.Checked = true;
+                        if (brojka == 3) radioButton3.Checked = true;
+                    }
+                }
+                else
+                {
+                    reader.Read();
+                    while (Convert.ToInt32(reader["RoditeljID"]) < sifra + 1) reader.Read();
+                    textBox1.Text = reader["RoditeljID"].ToString();
+                    textBox2.Text = reader["Ime"].ToString();
+                    textBox3.Text = reader["Prezime"].ToString();
+                    textBox4.Text = reader["Adresa"].ToString();
+                    maskedTextBox1.Text = reader["FiksniTelefon"].ToString();
+                    maskedTextBox2.Text = reader["MobilniTelefon"].ToString();
+                    int brojka = Convert.ToInt32(reader["SvojstvoID"]);
+                    if (brojka == 1) radioButton1.Checked = true;
+                    if (brojka == 2) radioButton2.Checked = true;
+                    if (brojka == 3) radioButton3.Checked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+            }
+        }
+private void Nacrtaj_Click(object sender, EventArgs e)
+        {
+
+            Graphics g = pictureBox1.CreateGraphics();
+
+            Pen p = new Pen(Color.Blue, 2);
+            Pen p1 = new Pen(Color.Red, 2);
+            Pen p2 = new Pen(Color.Green, 2);
+            g.DrawEllipse(p, 50, 50, 50, 50);
+            g.DrawRectangle(p2, 50, 100, 50, 50);
+            Point A = new Point(50, 100);
+            Point B = new Point(20, 50);
+            Point C = new Point(100, 100);
+            Point D = new Point(130, 150);
+            Point E = new Point(60, 150);
+            Point F = new Point(60, 200);
+            Point G = new Point(90, 150);
+            Point H = new Point(90, 200);
+            g.DrawLine(p1, A, B);
+            g.DrawLine(p1, C, D);
+            g.DrawLine(p1, E, F);
+            g.DrawLine(p1, G, H);
+            g.Dispose();
+            button5.Enabled = false;
+        }
+
+*Uzrast dece*
+*globalno*
+OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B27B28.accdb");
+        
+private void button1_Click(object sender, EventArgs e)
+        {
+            //listView1.Items.Clear();
+
+            string upit = "Select Ime, Prezime, DatumRodjenja AS [Datum Rodjenja], Pol From Dete, Pol Where Dete.PolID=Pol.PolID";
+
+            if (checkBox1.Checked && checkBox2.Checked)
+            {
+                upit += " And (Pol.Pol='Muški' Or Pol.Pol='Ženski')";
+            }
+            else if (checkBox1.Checked && checkBox2.Checked == false)
+                upit += " And Pol.Pol='Muški'";
+            else if (checkBox2.Checked && checkBox1.Checked == false)
+                upit += " And Pol.Pol='Ženski'";
+
+            DateTime danas = DateTime.Now;
+            decimal godina = danas.Year - numericUpDown1.Value;
+            upit += " And DatumRodjenja Like '%" + godina.ToString() + "'";
+
+            OleDbDataAdapter da = new OleDbDataAdapter(upit, con);
+            DataSet ds = new DataSet();
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            da.Fill(ds);
+            dataGridView1.DataSource = ds.Tables[0];
+
+            /*foreach (DataRow row in dt.Rows)
+            {
+                ListViewItem item = new ListViewItem(row[0].ToString());
+                for (int i = 1; i < dt.Columns.Count; i++)
+                {
+                    item.SubItems.Add(row[i].ToString());
+                }
+                listView1.Items.Add(item);
+            }*/
+        }private void button1_Click(object sender, EventArgs e)
+        {
+            //listView1.Items.Clear();
+
+            string upit = "Select Ime, Prezime, DatumRodjenja AS [Datum Rodjenja], Pol From Dete, Pol Where Dete.PolID=Pol.PolID";
+
+            if (checkBox1.Checked && checkBox2.Checked)
+            {
+                upit += " And (Pol.Pol='Muški' Or Pol.Pol='Ženski')";
+            }
+            else if (checkBox1.Checked && checkBox2.Checked == false)
+                upit += " And Pol.Pol='Muški'";
+            else if (checkBox2.Checked && checkBox1.Checked == false)
+                upit += " And Pol.Pol='Ženski'";
+
+            DateTime danas = DateTime.Now;
+            decimal godina = danas.Year - numericUpDown1.Value;
+            upit += " And DatumRodjenja Like '%" + godina.ToString() + "'";
+
+            OleDbDataAdapter da = new OleDbDataAdapter(upit, con);
+            DataSet ds = new DataSet();
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            da.Fill(ds);
+            dataGridView1.DataSource = ds.Tables[0];
+
+            /*foreach (DataRow row in dt.Rows)
+            {
+                ListViewItem item = new ListViewItem(row[0].ToString());
+                for (int i = 1; i < dt.Columns.Count; i++)
+                {
+                    item.SubItems.Add(row[i].ToString());
+                }
+                listView1.Items.Add(item);
+            }*/
+        }
+
+
