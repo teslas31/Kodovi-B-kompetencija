@@ -455,7 +455,21 @@ private void Obrisi_Click(object sender, EventArgs e)
             {
                 con.Close();
             }        }
+            
+          
+          
+-
+-
+-
+-
+-
 B3B4:
+-
+-
+-
+-
+
+
 private void FormaGlumci_Load(object sender, EventArgs e)
         {
             OleDbConnection con = new OleDbConnection();
@@ -771,7 +785,20 @@ Where Producent.Ime = '" + comboBox2.SelectedItem + "' And Tip_Uloge.Tip = '" + 
             foreach (DataRow dr in Ds.Tables[0].Rows)
                 listBox1.Items.Add(dr["Naziv"].ToString() + '	' + dr["ImeLika"].ToString() + '	' + dr["Ime"].ToString() + '	' + dr["Prezime"].ToString());
         }
+        
+-
+-
+-
+-
+-
 B5B6:
+-
+-
+-
+-
+-
+
+
 private void UnosGradova_Load(object sender, EventArgs e)
         {
             OleDbConnection con = new OleDbConnection();
@@ -1186,7 +1213,19 @@ private void Prikazi_Click(object sender, EventArgs e)
                 con.Close();
             }
         }
+        
+-
+-
+-
+-
+-
 B25B26:
+-
+-
+-
+-
+-
+
 private void Profesori_Load(object sender, EventArgs e)
         {
             //id novog
@@ -1595,8 +1634,18 @@ private void Prikazi_Click(object sender, EventArgs e)
             chart1.Series["Series1"].IsValueShownAsLabel = true;
             chart1.DataBind();
         }
-
+-
+-
+-
+-
+-
 B9B10:
+-
+-
+-
+-
+-
+
 Tip antikviteta
 private void Unesi_Click(object sender, EventArgs e)
         {
@@ -1873,7 +1922,20 @@ private void Prikazi_Click(object sender, EventArgs e)
             olovka2.Dispose();
             g.Dispose();
         }
+        
+-
+-
+-
+-
+-
+-
 B33B34:
+-
+-
+-
+-
+-
+
 Igraci:  *globalno*
 OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B33B34.accdb");
         int grad;
@@ -2388,8 +2450,18 @@ private void ComboSifra_SelectedIndexChanged()
                 con.Close();
             }
         }
-
+-
+-
+-
+-
+-
 B13B14:
+-
+-
+-
+-
+-
+
 private void Unos_knjiga_Load(object sender, EventArgs e)
         {
             OleDbConnection con = new OleDbConnection();
@@ -2713,11 +2785,7 @@ private void Prikazi_Click(object sender, EventArgs e)
   
             chart1.DataBind();
         }
-
-
-
-
-
+        
 
 
 *globalne*
@@ -2818,8 +2886,17 @@ private void Prikazi_Click(object sender, EventArgs e)
             chart1.ChartAreas[0].AxisX.LabelStyle.Angle = 90;
             chart1.DataBind();
         }
-
+-
+-
+-
+-
+-
 B27B28:
+-
+-
+-
+-
+
 *Broj dece*
 private void Prikazi_Click(object sender, EventArgs e)
         {
