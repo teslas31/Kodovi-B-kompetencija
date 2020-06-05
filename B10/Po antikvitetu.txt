@@ -1,0 +1,52 @@
+private void Prikazi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection Konekcija = new OleDbConnection();
+            Konekcija.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B9B10.accdb";
+            OleDbCommand Komanda = new OleDbCommand();
+            Komanda.Connection = Konekcija;
+            Komanda.CommandText = String.Format("SELECT Lokalitet.Naziv, Lokalitet.KoordinateDuzine, Lokalitet.KoordinateSirine FROM Tip_Antikviteta INNER JOIN(Lokalitet INNER JOIN Antikvitet ON Lokalitet.LokalitetID = Antikvitet.LokalitetID) ON Tip_Antikviteta.TipAntikvitetaID = Antikvitet.TipAntikvitetaID WHERE Tip_Antikviteta.Tip='{0}'", Naziv.Text);
+            Konekcija.Open();
+            DataSet Ds = new DataSet();
+            OleDbDataAdapter Da = new OleDbDataAdapter();
+            Da.SelectCommand = Komanda;
+            Da.Fill(Ds);
+            dataGridView1.DataSource = Ds.Tables[0];
+            Konekcija.Close();
+        }
+
+        private void Nacrtaj_Click(object sender, EventArgs e)
+        {
+            int selectedrowindex = dataGridView1.SelectedCells[0].RowIndex;
+            DataGridViewRow selectedRow = dataGridView1.Rows[selectedrowindex];
+            string a = Convert.ToString(selectedRow.Cells["KoordinateDuzine"].Value);
+            string b = Convert.ToString(selectedRow.Cells["KoordinateSirine"].Value);
+            string a1 = a.Substring(0, a.IndexOf(' ')), a2 = a.Substring(a.IndexOf(' ') + 1);
+            string b1 = b.Substring(0, b.IndexOf(' ')), b2 = b.Substring(b.IndexOf(' ') + 1);
+            int duzina, sirina;
+            if (String.Compare(a2, "istocno") == 0) duzina = Convert.ToInt32(a1); else duzina = -Convert.ToInt32(a1);
+            if (String.Compare(b2, "severno") == 0) sirina = Convert.ToInt32(b1); else sirina = -Convert.ToInt32(b1);
+            Pen olovka = new Pen(Color.Blue, 2);
+            Pen olovka2 = new Pen(Color.Red, 2);
+            Graphics g = pictureBox1.CreateGraphics();
+            g.DrawRectangle(olovka, 0, 0, 360, 180);
+            g.DrawLine(olovka, 0, 90, 360, 90);
+            g.DrawLine(olovka, 180, 0, 180, 180);
+            g.FillRectangle(Brushes.White, 0, 0, 360, 180);
+            g.DrawRectangle(olovka, 0, 0, 360, 180);
+            g.DrawLine(olovka, 0, 90, 360, 90);
+            g.DrawLine(olovka, 180, 0, 180, 180);
+            Rectangle elipsa = new Rectangle(180 + duzina, 90 - sirina, 3, 3);
+            g.DrawEllipse(olovka2, elipsa);
+            olovka.Dispose();
+            olovka2.Dispose();
+            g.Dispose();
+        }
+
+        private void Po_antikvitetu_Paint(object sender, PaintEventArgs e)
+        {
+            Pen olovka = new Pen(Color.Blue, 2);
+            Graphics g = pictureBox1.CreateGraphics();
+            g.DrawRectangle(olovka, 0, 0, 360, 180);
+            g.DrawLine(olovka, 0, 90, 360, 90);
+            g.DrawLine(olovka, 180, 0, 180, 180);
+        }

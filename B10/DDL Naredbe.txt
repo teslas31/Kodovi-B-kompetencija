@@ -1,0 +1,23 @@
+CREATE TABLE Grad (
+
+GradID int primary key,
+Naziv varchar(30),
+PozivniBroj varchar(30),
+PostanskiBroj int,
+BrojStanovnika int
+
+);
+
+CREATE TABLE Drzava (
+
+DrzavaID int primary key,
+PozivniBroj int,
+BrojStanovnika int
+
+);
+
+ALTER TABLE Grad
+Add column DrzavaID int;
+
+ALTER TABLE Grad
+add constraint DrzavaFK foreign key (DrzavaID) references Drzava (DrzavaID);
